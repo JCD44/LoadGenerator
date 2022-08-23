@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32002.261
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadGenerator", "LoadGenerator\LoadGenerator.csproj", "{637F429A-FB5B-4E75-B262-54C26C4B1B3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadGeneratorTest", "LoadGeneratorTest\LoadGeneratorTest.csproj", "{8526B330-FEBA-48BE-AFE3-98E80D355008}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{637F429A-FB5B-4E75-B262-54C26C4B1B3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{637F429A-FB5B-4E75-B262-54C26C4B1B3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{637F429A-FB5B-4E75-B262-54C26C4B1B3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{637F429A-FB5B-4E75-B262-54C26C4B1B3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8526B330-FEBA-48BE-AFE3-98E80D355008}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8526B330-FEBA-48BE-AFE3-98E80D355008}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8526B330-FEBA-48BE-AFE3-98E80D355008}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8526B330-FEBA-48BE-AFE3-98E80D355008}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {78379EB7-54A3-4B7C-A26C-17F9296FE4BA}
+	EndGlobalSection
+EndGlobal
