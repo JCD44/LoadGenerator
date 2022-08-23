@@ -85,7 +85,7 @@ var settings = new DynamicDataLoadSettings<TestData>
                 TimeBetweenCalls = TimeSpan.FromSeconds(1),
             };
             settings.Events.Add(logging);
-			var loadTest = new DynamicDataLoadTesting<TestData>();
+            var loadTest = new DynamicDataLoadTesting<TestData>();
             var results = loadTest.Execute(settings);
 ```
 
@@ -97,8 +97,8 @@ TPL is designed to dynamically adjust the number of tasks or threads it can run 
             loadTest.TaskOverheadPercentage = .4;
             //+10 more fixed tasks
             loadTest.TaskOverheadFixed = 10;
-			...
-			var results = loadTest.Execute(settings);
+            ...
+            var results = loadTest.Execute(settings);
 ```
 
 
