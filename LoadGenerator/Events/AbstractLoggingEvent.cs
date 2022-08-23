@@ -12,9 +12,9 @@ namespace LoadGenerator.Events
         {
             var end = DateTime.Now;
             var ts = end - result.StartTime;
-            var resultCount = result.Results.Count();
+            var resultCount = result.TotalResults;
 
-            var failures = result.Results.Count(a => !a.Success);
+            var failures = result.FailureCount;
             var tps = (resultCount - failures) / ts.TotalSeconds;
             tps = Math.Round(tps, 2);
 

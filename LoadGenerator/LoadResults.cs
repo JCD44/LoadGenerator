@@ -10,6 +10,9 @@ namespace LoadGenerator
     {
         public ILoadSettings<TestData> Settings { get; set; }
         public IEnumerable<LoadResult<TestData>> Results { get; private set; } = new Queue<LoadResult<TestData>>();
+        public IEnumerable<LoadResult<TestData>> Failures { get { return Results.Where(a => !a.Success); } }
+        public int FailureCount { get { return Results.Count(a => !a.Success);  } }
+        public int TotalResults { get { return Results.Count();  } }
         public void AddResult(LoadResult<TestData> result)
         {
             lock (Results)
