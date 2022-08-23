@@ -4,33 +4,33 @@ A package designed to allow you to run load tests on any arbitrary method that c
 
 ## Features
 
-* Customizable loadtesting
- - You can run load on a preloaded list of datapoints
- - You can run load on a dynamically generated dataset
- - You can run load with no dynamic data
+* Customizable load testing
+  - You can run load on a preloaded list of datapoints
+  - You can run load on a dynamically generated dataset
+  - You can run load with no dynamic data
 * Dynamic Reporting
- - You can output data via events during the load test.
+  - You can output data via events during the load test.
 * Dynamic load
- - You can dynamically adjust the load test using events.
+  - You can dynamically adjust the load test using events.
 * Built on top of TPL
- - You can use task cancel tokens to dynamically timeout or end tests early.
+  - You can use task cancel tokens to dynamically timeout or end tests early.
  
 # Usage
 
 Two things are needed to run a load test.  Settings and something to execute those settings.  It is recommended you use the dynamic data load test for all features, while the cached data load test system has many few features.  The cached system is primarily just a Parallel.ForEach under the hood, while the dynamic data manages tasks directly.  Due to this difference, the dynamic data runs with slightly more overhead, but has many additional features.  Here are the primary settings for the dynamic data load test:
 
-* MaxSimulatedUsers - In some load test systems these would be referred to as threads.  This will directly impact the TPL thread pool.
-* MaxMethodExecutions - The maximum number of times a method will be called.
-* TestDataGenerator - The method called in order to generate data for the test method.  This maybe be something like user credentials, url data, etc.
-* TestMethod - The method which will run the test.  This method must take in some specific parameters.
-* MaxTestExecutionTimeInSeconds - The maximum time load will be generated.  In the cached system, if this time is exceeded it will request the for loop cancel.  In the dynamic system, if time is exceeded, it will allow running tasks to finish up to the MaxExecutionTimeInSeconds before requesting the methods be cancelled.
-* MaxExecutionTimeInSeconds - The maximum time a single method call will run before the task is requested to be cancelled.
-* Events - Events have two parts, "should I run?" and "what I do".  
- - The "should I run?" piece needs to run quickly as it runs on the main thread.
- - You should only create two styles of events, "reporting" or read only events and "settings" or write only events.  It is strongly recommended not to mix the two.
- - If an event should be run and it does not update settings, it will be run on a separate task.  If it will update settings it must run on the main thread.
- - Events are always run after the load test is completed, regardless of the result from "should I run?"
-* EventFrequencyInSeconds - How frequently the events have the "should I run?" piece executed.  Set to 0 means everytime the system has enough "max" tasks running, events will be checked.
+* MaxSimulatedUsers  - In some load test systems these would be referred to as threads.  This will directly impact the TPL thread pool.
+* MaxMethodExecutions  - The maximum number of times a method will be called.
+* TestDataGenerator  - The method called in order to generate data for the test method.  This maybe be something like user credentials, url data, etc.
+* TestMethod  - The method which will run the test.  This method must take in some specific parameters.
+* MaxTestExecutionTimeInSeconds  - The maximum time load will be generated.  In the cached system, if this time is exceeded it will request the for loop cancel.  In the dynamic system, if time is exceeded, it will allow running tasks to finish up to the MaxExecutionTimeInSeconds before requesting the methods be cancelled.
+* MaxExecutionTimeInSeconds  - The maximum time a single method call will run before the task is requested to be cancelled.
+* Events  - Events have two parts, "should I run?" and "what I do".  
+  - The "should I run?" piece needs to run quickly as it runs on the main thread.
+  - You should only create two styles of events, "reporting" or read only events and "settings" or write only events.  It is strongly recommended not to mix the two.
+  - If an event should be run and it does not update settings, it will be run on a separate task.  If it will update settings it must run on the main thread.
+  - Events are always run after the load test is completed, regardless of the result from "should I run?"
+* EventFrequencyInSeconds  - How frequently the events have the "should I run?" piece executed.  Set to 0 means everytime the system has enough "max" tasks running, events will be checked.
 
 
 ## Example Usage:
@@ -92,8 +92,8 @@ var settings = new DynamicDataLoadSettings<TestData>
 ### Unexpected Complexity
 TPL is designed to dynamically adjust the number of tasks or threads it can run at once.  As you use TPL it may add additional threads to the thread pool, but that requires time for the system to respond.  Time we don't have.  To deal with this, we have to update the threadpool with the number of users your load test requests.  Yet, you may use tasks in your test method or any third party libraries may use tasks.  How many threads do we really need?  Unfortunately, it is impossible to know, so as a stab in the dark, we take max users and multiply it by a fudge factor + n additional threads.  These values can be changed by you in the load test instance like this:
 ```
-			var loadTest = new DynamicDataLoadTesting<TestData>();
-			//40% additional overhead
+            var loadTest = new DynamicDataLoadTesting<TestData>();
+            //40% additional overhead
             loadTest.TaskOverheadPercentage = .4;
             //+10 more fixed tasks
             loadTest.TaskOverheadFixed = 10;
@@ -141,12 +141,12 @@ No currently released version.
 
 ## Primary Authors
 
-* **JCD** - *Initial work*
+* **JCD**  - *Initial work*
 
 
 ## License
 
-This project is licensed under the GPL v2 License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the GPL v2 License  - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
 
