@@ -1,6 +1,10 @@
 # LoadGenerator
 
-A package designed to allow you to run load tests on any arbitrary method that conforms to a specific signature.  
+A package designed to allow you to run load tests on any arbitrary method that conforms to a specific signature.
+
+## Who is this for?
+
+This is for engineers who make integration tests using API calls.  Unfortunately, those integration tests never include any load testing.  Instead, we make big complex load tests using record and playback of our website, making it difficult to debug which elements of the site are slow.  Furthermore, because the load test is complex and often not built in the same tool we do everything else in, we don't run it frequently, so we don't get fast feedback on changes to performance.  This tool is meant to allow you to do smaller load tests more frequently, mostly at the API level.  It is not meant to replace the load testing tools which are more robust and complex, but rather to supplement them in the same way unit tests are not meant to replace system level testing.  The big advantage to this system is that it is easy to wrap an API call in the framework and then perform a load test for each and every API endpoint you have.  If you're not sure what the expected performance should be for a given endpoint in your non-production environment, you can even record the performance data into a database and then use that as a baseline.
 
 ## Features
 
@@ -66,7 +70,7 @@ Here is an example of creating settings in which the input object is a simple st
 Here is the same code but with a complex object called "TestData":
 
 ```
-var settings = new DynamicDataLoadSettings<TestData>
+            var settings = new DynamicDataLoadSettings<TestData>
             {
                 MaxSimulatedUsers = 50,
                 MaxMethodExecutions = 100,
@@ -87,6 +91,41 @@ var settings = new DynamicDataLoadSettings<TestData>
             settings.Events.Add(logging);
             var loadTest = new DynamicDataLoadTesting<TestData>();
             var results = loadTest.Execute(settings);
+```
+
+Here is an example of building a custom event for logging:
+
+```
+        private class ConsoleLoggingEventCounter<TestData> : ConsoleLoggingEvent<TestData>
+        {
+            public override void Log(string s)
+            {
+                WriteLineToDatabase(s);
+            }
+
+        }
+```
+
+
+Here is an example of building a custom event for updating settings:
+
+```
+ private class AdjustSettingsEvent<TestData> : AbstractTimeBasedEvent<TestData>, ISettingsUpdate//You must implement ISettingsUpdate in order to update settings.
+        {
+            public override ILoadSettings<TestData> Execute(ILoadResults<TestData> results, ILoadSettings<TestData> settings)
+            {
+                var ts = results.EndTime - results.StartTime;
+
+                var resultCount = results.TotalResults;
+                var failures = results.TotalFailures;
+                var tps = (resultCount - failures) / ts.TotalSeconds;
+
+                if(tps<=20 && settings.MaxSimulatedUsers<50) settings.MaxSimulatedUsers += 5;
+                Write("Updating settings");
+
+                return settings;
+            }
+        }
 ```
 
 ### Unexpected Complexity

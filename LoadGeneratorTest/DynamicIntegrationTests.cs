@@ -98,6 +98,7 @@ namespace LoadGeneratorTest
             UpdateThreadName();
             var settings = new DynamicDataLoadSettings<TestData>
             {
+
                 MaxSimulatedUsers = 4,
                 MaxMethodExecutions = 4,
                 TestDataGenerator = CreateData,
@@ -116,8 +117,58 @@ namespace LoadGeneratorTest
                 Assert.IsTrue(r.Error==null, $"No Error: {r.Error}");
             }
             BasicAsserts(settings, results);
-
         }
+
+        [TestMethod]
+        public void SettingsCanBeAdjustedByEvents()
+        {
+            UpdateThreadName();
+            var settings = new DynamicDataLoadSettings<TestData>
+            {
+                MaxSimulatedUsers = 1,
+                MaxMethodExecutions = 50,
+                TestDataGenerator = CreateDataLongWait,
+                TestMethod = WaitWithToken,
+                MaxTestExecutionTimeInSeconds = 10,
+                EventFrequencyInSeconds = 0
+            };
+
+            var logging = new AdjustSettingsEvent<TestData>()
+            {
+                TimeBetweenCalls = TimeSpan.FromSeconds(1),
+            };
+            settings.Events.Add(logging);
+
+
+            var d = new DynamicDataLoadTesting<TestData>();
+            var results = d.Execute(settings);
+
+            LogResults(results);
+
+            Write("Asserts:");
+            Assert.IsTrue(settings.MaxSimulatedUsers>=50, $"Settings was updated to be ~50 users from 1. Settings: {settings.MaxSimulatedUsers}");
+            Assert.IsTrue(results.ExecutionTime.TotalSeconds <= 40, $"Total time taken should not be over 40 seconds (it was {results.ExecutionTime.TotalSeconds}) given the update in settings.");
+
+            BasicAsserts(settings, results);
+        }
+
+        private class AdjustSettingsEvent<TestData> : AbstractTimeBasedEvent<TestData>, ISettingsUpdate
+        {
+            public override ILoadSettings<TestData> Execute(ILoadResults<TestData> results, ILoadSettings<TestData> settings)
+            {
+                var ts = results.EndTime - results.StartTime;
+
+                var resultCount = results.TotalResults;
+                var failures = results.TotalFailures;
+                var tps = (resultCount - failures) / ts.TotalSeconds;
+
+                if(tps<=5 && settings.MaxSimulatedUsers<50) settings.MaxSimulatedUsers += 50;
+                Write("Updating settings");
+
+                return settings;
+            }
+        }
+
 
         private class ConsoleLoggingEventCounter<TestData> : ConsoleLoggingEvent<TestData>
         {
@@ -187,8 +238,6 @@ namespace LoadGeneratorTest
             BasicAsserts(settings, results);
 
         }
-
-
 
         [TestMethod]
         public void OperationIsCancelledDueToTokenTimeout()

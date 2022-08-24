@@ -9,7 +9,6 @@ namespace LoadGenerator.Events
     {
         public TimeSpan TimeBetweenCalls { get; set; } = TimeSpan.MaxValue;
         private DateTime TimeLastExecutionRequested { get; set; } = DateTime.MinValue;
-        public bool MainThreadUpdateSettings { get; protected set; } = false;
 
         public abstract ILoadSettings<TestData> Execute(ILoadResults<TestData> results, ILoadSettings<TestData> settings);
 

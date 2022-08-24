@@ -204,7 +204,7 @@ namespace LoadGenerator
                 {
                     if (forceExecution || e.ShouldExecute(results, settings))
                     {
-                        if (!e.MainThreadUpdateSettings)
+                        if (e is ISettingsUpdate)
                         {
                             settings = (DynamicDataLoadSettings<TestData>)e.Execute(results, settings);
                             UpdatePool(settings);
