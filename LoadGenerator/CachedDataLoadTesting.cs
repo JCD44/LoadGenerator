@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LoadGenerator.Results;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ namespace LoadGenerator
 {
     public class CachedDataLoadTesting<TestData> : AbstractLoadTesting<TestData>
     {
-        private LoadResults<TestData> Execute(CachedDataLoadSettings<TestData> settings)
+        private ILoadResults<TestData> Execute(CachedDataLoadSettings<TestData> settings)
         { 
             var results = CreateResults(settings);
             var data = settings.TestDataGenerator.Invoke(settings);
@@ -37,7 +38,7 @@ namespace LoadGenerator
             return results;
         }
 
-        protected override LoadResults<TestData> InternalExecute(ILoadSettings<TestData> settings)
+        protected override ILoadResults<TestData> InternalExecute(ILoadSettings<TestData> settings)
         {
             return Execute((CachedDataLoadSettings<TestData>)settings);
         }

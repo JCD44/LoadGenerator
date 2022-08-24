@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LoadGenerator.Results;
+using System;
 using System.Threading;
 
 namespace LoadGenerator.Events
@@ -10,8 +11,12 @@ namespace LoadGenerator.Events
         /// (to limit overhead)
         /// </summary>
         /// <returns></returns>
-        bool ShouldExecute(LoadResults<TestData> result, ILoadSettings<TestData> settings);
-        ILoadSettings<TestData> Execute(LoadResults<TestData> result, ILoadSettings<TestData> settings);
+        bool ShouldExecute(ILoadResults<TestData> results, ILoadSettings<TestData> settings);
+        ILoadSettings<TestData> Execute(ILoadResults<TestData> results, ILoadSettings<TestData> settings);
+        /// <summary>
+        /// Run once before load test is started.
+        /// </summary>
+        /// <param name="settings"></param>
         void Init(ILoadSettings<TestData> settings);
         /// <summary>
         /// If settings are updated it will run on the main thread, meaning it may impact performance.  Only set 

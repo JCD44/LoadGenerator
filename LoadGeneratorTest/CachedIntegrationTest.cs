@@ -1,4 +1,5 @@
 ﻿using LoadGenerator;
+using LoadGenerator.Results;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -68,17 +69,17 @@ namespace LoadGeneratorTest
             Console.WriteLine($"ID: {System.Threading.Thread.CurrentThread.ManagedThreadId}, {DateTime.Now.ToString("hh:mm:ss.fff")} - {s}");
         }
 
-        private void LogResults(LoadResults<TestData> results)
+        private void LogResults(ILoadResults<TestData> results)
         {
             Write("Logging for Debug:");
-            Write($"Total Time: {results.TimeSpan}");
+            Write($"Total Time: {results.ExecutionTime}");
             foreach (var r in results.Results)
             {
-                Write($"{r.Input} - {r.Success} - {r.Start} - {r.ExecutionTime} - {r?.Error?.Message}");
+                Write($"{r.Input} - {r.Success} - {r.StartTime} - {r.ExecutionTime} - {r?.Error?.Message}");
             }
         }
 
-        private void BasicAsserts(CachedDataLoadSettings<TestData> settings, LoadResults<TestData> results)
+        private void BasicAsserts(CachedDataLoadSettings<TestData> settings, ILoadResults<TestData> results)
         {
             Assert.IsTrue(MaxMethodExecutions <= results.Results.Count(), "Requested number of executions equalts results");
             foreach (var r in results.Results)
@@ -166,7 +167,7 @@ namespace LoadGeneratorTest
                 Assert.AreEqual(hasError, !r.Success, "Success marked true when it doesn't have an exception");
             }
 
-            Assert.IsTrue(results.TimeSpan.TotalSeconds < 15, "Timespan should be much less than 15 seconds as each test takes 5 seconds");
+            Assert.IsTrue(results.ExecutionTime.TotalSeconds < 15, "Timespan should be much less than 15 seconds as each test takes 5 seconds");
             Assert.IsTrue(results.Results.Count() <= 2, "No more than 2 results should be recorded.");
 
 

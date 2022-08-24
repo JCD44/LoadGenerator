@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LoadGenerator.Results;
+using System;
 using System.Threading;
 
 namespace LoadGenerator
@@ -26,21 +27,21 @@ namespace LoadGenerator
         protected int PreviousMinCompletionPortThreads { get; private set; }
 
 
-        public LoadResults<TestData> Execute(ILoadSettings<TestData> settings)
+        public ILoadResults<TestData> Execute(ILoadSettings<TestData> settings)
         {
             return Executor(settings);
         }
 
-        protected abstract LoadResults<TestData> InternalExecute(ILoadSettings<TestData> settings);
+        protected abstract ILoadResults<TestData> InternalExecute(ILoadSettings<TestData> settings);
 
-        protected virtual LoadResults<TestData> Cleanup(ILoadSettings<TestData> settings, LoadResults<TestData> results)
+        protected virtual ILoadResults<TestData> Cleanup(ILoadSettings<TestData> settings, ILoadResults<TestData> results)
         {
             RevertPool();
 
             return Finish(results);
         }
 
-        protected LoadResults<TestData> Executor(ILoadSettings<TestData> settings)
+        protected ILoadResults<TestData> Executor(ILoadSettings<TestData> settings)
         {
             Init(settings);
 
@@ -53,7 +54,10 @@ namespace LoadGenerator
         {
             InitPool(settings);
         }
-        protected LoadResults<TestData> CreateResults(ILoadSettings<TestData> settings)
+        /// <summary>
+        /// Allows you to replace results with your own object.
+        /// </summary>
+         protected virtual ILoadResults<TestData> CreateResults(ILoadSettings<TestData> settings)
         {
             return new LoadResults<TestData>()
             {
@@ -62,22 +66,29 @@ namespace LoadGenerator
             };
         }
 
-        private LoadResults<TestData> Finish(LoadResults<TestData> results)
+        protected virtual ILoadResults<TestData> Finish(ILoadResults<TestData> results)
         {
             var end = DateTime.Now;
 
-            results.TimeSpan = end - results.StartTime;
+            results.ExecutionTime = end - results.StartTime;
 
             return results;
         }
-
-        protected LoadResult<TestData> RunSingleExecution(TestData data, ILoadSettings<TestData> settings, ThreadSupportData threadData)
+        /// <summary>
+        /// Allows replacement of result with your own object.
+        /// </summary>
+        protected virtual ILoadResult<TestData> CreateResult(TestData data)
         {
-            var result = new LoadResult<TestData>
+            return new LoadResult<TestData>
             {
-                Start = DateTime.Now,
-                Input = data                
+                StartTime = DateTime.Now,
+                Input = data
             };
+        }
+
+        protected ILoadResult<TestData> RunSingleExecution(TestData data, ILoadSettings<TestData> settings, ThreadSupportData threadData)
+        {
+            var result = CreateResult(data);
 
             try
             {
@@ -91,7 +102,7 @@ namespace LoadGenerator
             }
 
             var end = DateTime.Now;
-            result.ExecutionTime = end - result.Start;
+            result.ExecutionTime = end - result.StartTime;
 
             return result;
         }

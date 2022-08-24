@@ -1,4 +1,5 @@
 ﻿using LoadGenerator.Events;
+using LoadGenerator.Results;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +45,6 @@ namespace LoadGenerator
             {
                 if(Task.IsCompleted || Task.IsFaulted || Task.IsCanceled) Task.Dispose();
                 ThreadData?.Dispose();
-
             }
         }
 
@@ -117,21 +117,21 @@ namespace LoadGenerator
             ProcessCompletedTasks(eventTasks);
         }
 
-        protected bool IsDone(LoadResults<TestData> results, List<TaskTracker> tasks, DynamicDataLoadSettings<TestData> settings)
+        protected bool IsDone(ILoadResults<TestData> results, List<TaskTracker> tasks, DynamicDataLoadSettings<TestData> settings)
         {
             if (HasExecutedMaxResults(results, tasks, settings)) return true;
 
             return HasExecutedMaxTime(results, tasks, settings);
         }
 
-        protected bool HasExecutedMaxTime(LoadResults<TestData> results, List<TaskTracker> tasks, DynamicDataLoadSettings<TestData> settings)
+        protected bool HasExecutedMaxTime(ILoadResults<TestData> results, List<TaskTracker> tasks, DynamicDataLoadSettings<TestData> settings)
         {
             //Never execute past max time if Max is set to 0 or less.
             if (settings.MaxExecutionTimeInSeconds <= 0) return false;
             return results.StartTime.AddSeconds(settings.MaxExecutionTimeInSeconds) <= DateTime.Now;
         }
 
-        protected bool HasExecutedMaxResults(LoadResults<TestData> results, List<TaskTracker> tasks, DynamicDataLoadSettings<TestData> settings)
+        protected bool HasExecutedMaxResults(ILoadResults<TestData> results, List<TaskTracker> tasks, DynamicDataLoadSettings<TestData> settings)
         {
             var result = results.Results.Count() + timedOutTasks.Count + tasks.Count >= settings.MaxMethodExecutions;
             lock (tasks)
@@ -151,7 +151,7 @@ namespace LoadGenerator
             DebugLog(s);
         }
         private static int counter = 0;
-        protected void CreateNewTaskIfOrElseWait(List<TaskTracker> tasks, DynamicDataLoadSettings<TestData> settings, LoadResults<TestData> results)
+        protected void CreateNewTaskIfOrElseWait(List<TaskTracker> tasks, DynamicDataLoadSettings<TestData> settings, ILoadResults<TestData> results)
         {
             if (tasks.Count < settings.MaxSimulatedUsers)
             {
@@ -194,7 +194,7 @@ namespace LoadGenerator
 
         }
 
-        protected virtual DynamicDataLoadSettings<TestData> RunEvents(DynamicDataLoadSettings<TestData> settings, LoadResults<TestData> results, bool forceExecution = false)
+        protected virtual DynamicDataLoadSettings<TestData> RunEvents(DynamicDataLoadSettings<TestData> settings, ILoadResults<TestData> results, bool forceExecution = false)
         {
             if (ShouldRunEvents(settings))
             {
@@ -246,7 +246,7 @@ namespace LoadGenerator
             }
         }
 
-        private LoadResults<TestData> Execute(DynamicDataLoadSettings<TestData> settings)
+        private ILoadResults<TestData> Execute(DynamicDataLoadSettings<TestData> settings)
         {
             var results = CreateResults(settings);
             var tasks = new List<TaskTracker>();
@@ -270,14 +270,12 @@ namespace LoadGenerator
             ProcessCompletedTasks(timedOutTasks);
             foreach(var item in timedOutTasks)
             {
-                results.AddResult(new LoadResult<TestData>()
-                {
-                    ExecutionTime = TimeSpan.FromSeconds(settings.MaxTestExecutionTimeInSeconds),
-                    Error = new Exception("Test timed out, results maybe asynchronusly added after this point"),
-                    Success = false,
-                    Start = DateTime.Now,
-                    Input = item.Data,
-                });
+                var startResult = CreateResult(item.Data);
+                startResult.ExecutionTime = TimeSpan.FromSeconds(settings.MaxTestExecutionTimeInSeconds);
+                startResult.Error = new Exception("Test timed out, results maybe asynchronusly added after this point");
+                startResult.Success = false;
+              
+                results.AddResult(startResult);
             }
 
             if (!IsDone(results, tasks, settings))
@@ -300,7 +298,7 @@ namespace LoadGenerator
             return new ThreadSupportData(cts);
         }
 
-        protected override LoadResults<TestData> InternalExecute(ILoadSettings<TestData> settings)
+        protected override ILoadResults<TestData> InternalExecute(ILoadSettings<TestData> settings)
         {
             return Execute( (DynamicDataLoadSettings<TestData>)settings);
         }
