@@ -175,7 +175,7 @@ Feel free to contact me, however any pull request without clear documentation of
 
 ## Versioning
 
-No currently released version.
+0.9.0 - Initial Release.
 
 
 ## Primary Authors
