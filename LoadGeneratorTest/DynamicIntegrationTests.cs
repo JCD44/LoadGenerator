@@ -3,10 +3,7 @@ using LoadGenerator.Events;
 using LoadGenerator.Results;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace LoadGeneratorTest
 {
@@ -76,18 +73,19 @@ namespace LoadGeneratorTest
         {
             Write("Logging for Debug:");
             Write($"Total Time: {results.ExecutionTime}");
+            Write(results.CreateSummary().ToString());
             foreach (var r in results.Results)
             {
-                Write($"{r.Input} - {r.Success} - {r.StartTime} - {r.ExecutionTime} - {r?.Error?.Message}");
+                Write($"{r.Input} - {r.Success} - {r.StartTime} - {r.ExecutionTime} - {r?.ErrorResult?.Message}");
             }
         }
 
         private void BasicAsserts(DynamicDataLoadSettings<TestData> settings, ILoadResults<TestData> results)
         {
             Assert.IsTrue(settings.MaxMethodExecutions <= results.Results.Count(), "Requested number of executions equals results");
-            foreach (var r in results.Results) 
+            foreach (var r in results.Results)
             {
-                var hasError = r.Error != null;
+                var hasError = r.ErrorResult != null;
                 Assert.AreEqual(hasError, !r.Success, "Success marked true when it doesn't have an exception");
             }
         }
@@ -114,7 +112,7 @@ namespace LoadGeneratorTest
             foreach (var r in results.Results)
             {
                 Assert.IsTrue(r.ExecutionTime.TotalSeconds < settings.MaxTestExecutionTimeInSeconds, $"{r.ExecutionTime.TotalSeconds} < {settings.MaxTestExecutionTimeInSeconds} - Execution time must be shorter than timeout.");
-                Assert.IsTrue(r.Error==null, $"No Error: {r.Error}");
+                Assert.IsTrue(r.ErrorResult == null, $"No Error: {r.ErrorResult}");
             }
             BasicAsserts(settings, results);
         }
@@ -146,7 +144,7 @@ namespace LoadGeneratorTest
             LogResults(results);
 
             Write("Asserts:");
-            Assert.IsTrue(settings.MaxSimulatedUsers>=50, $"Settings was updated to be ~50 users from 1. Settings: {settings.MaxSimulatedUsers}");
+            Assert.IsTrue(settings.MaxSimulatedUsers >= 50, $"Settings was updated to be ~50 users from 1. Settings: {settings.MaxSimulatedUsers}");
             Assert.IsTrue(results.ExecutionTime.TotalSeconds <= 40, $"Total time taken should not be over 40 seconds (it was {results.ExecutionTime.TotalSeconds}) given the update in settings.");
 
             BasicAsserts(settings, results);
@@ -162,7 +160,7 @@ namespace LoadGeneratorTest
                 var failures = results.TotalFailures;
                 var tps = (resultCount - failures) / ts.TotalSeconds;
 
-                if(tps<=5 && settings.MaxSimulatedUsers<50) settings.MaxSimulatedUsers += 50;
+                if (tps <= 5 && settings.MaxSimulatedUsers < 50) settings.MaxSimulatedUsers += 50;
                 Write("Updating settings");
 
                 return settings;
@@ -206,9 +204,40 @@ namespace LoadGeneratorTest
             LogResults(results);
 
             Write("Asserts:");
-            
+
             BasicAsserts(settings, results);
             Assert.IsTrue(logging.Counter > 0, $"{logging.Counter} > 0");
+
+        }
+
+
+
+        [TestMethod]
+        public void SummaryDataIncludesGroupedErrors()
+        {
+            UpdateThreadName();
+            var settings = new DynamicDataLoadSettings<TestData>
+            {
+                MaxSimulatedUsers = 1,
+                MaxMethodExecutions = 4,
+                TestDataGenerator = CreateData,
+                TestMethod = ThrowError,
+                MaxTestExecutionTimeInSeconds = 3,
+            };
+
+            var d = new DynamicDataLoadTesting<TestData>();
+            var results = d.Execute(settings);
+            var summary = results.CreateSummary();
+
+            LogResults(results);
+            Write(summary.ToStringDetails());
+
+            Write("Asserts:");
+
+            BasicAsserts(settings, results);
+            var errorMessages = summary.ErrorCountGroupedByMessage;
+            Assert.AreEqual(errorMessages.Count, 1, "Only one type of error message found");
+            Assert.AreEqual(errorMessages.First().Value, 4, "Error occurred 4 times");
 
         }
 
@@ -233,7 +262,7 @@ namespace LoadGeneratorTest
             Write("Asserts:");
             foreach (var r in results.Results)
             {
-                Assert.IsTrue(r.Error != null, "Error");
+                Assert.IsTrue(r.ErrorResult != null, "Error");
             }
             BasicAsserts(settings, results);
 
@@ -261,8 +290,8 @@ namespace LoadGeneratorTest
             {
                 Assert.IsTrue(r.ExecutionTime.TotalSeconds + .01 >= settings.MaxTestExecutionTimeInSeconds, $"{r.ExecutionTime.TotalSeconds + .01} >= {settings.MaxTestExecutionTimeInSeconds} - Execution time must be longer than settings");
                 //Timeout shouldn't be too long.
-                Assert.IsNotNull(r.Error);
-                Assert.IsTrue(r.Error.Message.Contains("operation was canceled"), "Error shows operation was canceled");
+                Assert.IsNotNull(r.ErrorResult);
+                Assert.IsTrue(r.ErrorResult.Message.Contains("operation was canceled"), "Error shows operation was canceled");
 
             }
             BasicAsserts(settings, results);
@@ -290,7 +319,7 @@ namespace LoadGeneratorTest
 
             foreach (var r in results.Results)
             {
-                var hasError = r.Error != null;
+                var hasError = r.ErrorResult != null;
                 Assert.AreEqual(hasError, !r.Success, "Success marked true when it doesn't have an exception");
             }
 
@@ -321,7 +350,7 @@ namespace LoadGeneratorTest
             foreach (var r in results.Results)
             {
                 Assert.IsTrue(r.ExecutionTime.TotalSeconds + .01 >= settings.MaxTestExecutionTimeInSeconds, $"{r.ExecutionTime.TotalSeconds + .01} >= {settings.MaxTestExecutionTimeInSeconds} - Execution time must be longer than settings");
-                Assert.IsTrue(r.Error.Message.Contains("Test timed out"), "Error shows test timed out.");
+                Assert.IsTrue(r.ErrorResult.Message.Contains("Test timed out"), "Error shows test timed out.");
 
             }
             BasicAsserts(settings, results);

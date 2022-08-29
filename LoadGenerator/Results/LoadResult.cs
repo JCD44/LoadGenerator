@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LoadGenerator.Results
 {
@@ -9,7 +7,7 @@ namespace LoadGenerator.Results
         public bool Success { get; set; }
         public DateTime StartTime { get; set; }
         public TimeSpan ExecutionTime { get; set; }
-        public Exception Error { get; set; }
+        public Exception ErrorResult { get; set; }
         public TestData Input { get; set; }
 
         public DateTime EndTime
@@ -25,7 +23,7 @@ namespace LoadGenerator.Results
 
         public override string ToString()
         {
-            return $"{Success}, {StartTime}, {EndTime}, {ExecutionTime}, {FixToCsv(Error?.Message)}, {FixToCsv(Input?.ToString())}";
+            return $"{Success}, {StartTime}, {EndTime}, {ExecutionTime}, {FixToCsv(ErrorResult?.Message)}, {FixToCsv(Input?.ToString())}";
         }
 
         private static string FixToCsv(string value)

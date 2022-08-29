@@ -3,7 +3,6 @@ using LoadGenerator.Results;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,13 +11,13 @@ namespace LoadGenerator
     public class DynamicDataLoadTesting<TestData> : AbstractLoadTesting<TestData>
     {
         private readonly List<TaskTracker> timedOutTasks = new List<TaskTracker>();
-        protected DateTime LastEventExecution = DateTime.Now;
+        protected DateTime LastEventExecution { get; set; } = DateTime.Now;
         private readonly List<TaskTracker> eventTasks = new List<TaskTracker>();
 
         protected bool ShouldRunEvents(DynamicDataLoadSettings<TestData> settings)
         {
             if (settings.Events.Count == 0) return false;
-            if(LastEventExecution.AddSeconds(settings.EventFrequencyInSeconds)<DateTime.Now)
+            if (LastEventExecution.AddSeconds(settings.EventFrequencyInSeconds) < DateTime.Now)
             {
                 LastEventExecution = DateTime.Now;
                 return true;
@@ -31,11 +30,13 @@ namespace LoadGenerator
             public Task Task { get; set; }
             public DateTime InitTime { get; set; }
             public DateTime StartTime { get; set; } = DateTime.MinValue;
-            public int SecondsRun() {
+            public int SecondsRun()
+            {
                 if (StartTime == DateTime.MinValue) return 0;
-                
-                var end = DateTime.Now; 
-                return (int)(end - StartTime).TotalSeconds; }
+
+                var end = DateTime.Now;
+                return (int)(end - StartTime).TotalSeconds;
+            }
             public ThreadSupportData ThreadData { get; set; }
             public TestData Data { get; set; }
             //Only used for events.
@@ -43,12 +44,12 @@ namespace LoadGenerator
 
             public void Dispose()
             {
-                if(Task.IsCompleted || Task.IsFaulted || Task.IsCanceled) Task.Dispose();
+                if (Task.IsCompleted || Task.IsFaulted || Task.IsCanceled) Task.Dispose();
                 ThreadData?.Dispose();
             }
         }
 
-        private void DisposeTasks(List<TaskTracker> list)
+        private static void DisposeTasks(List<TaskTracker> list)
         {
             foreach (var item in list)
             {
@@ -63,7 +64,7 @@ namespace LoadGenerator
             }
         }
 
-        private void ProcessCompletedTasks(List<TaskTracker> tasks)
+        private static void ProcessCompletedTasks(List<TaskTracker> tasks)
         {
             List<TaskTracker> tasksToDispose = tasks.Where(a => a.Task.IsCompleted || a.Task.IsCompletedSuccessfully || a.Task.IsCanceled).ToList();
 
@@ -71,7 +72,7 @@ namespace LoadGenerator
             {
                 //Unsafe operation... so let's do it safely
                 lock (tasks)
-                {    
+                {
                     tasks.RemoveAll(a => tasksToDispose.Contains(a));
                 }
 
@@ -86,7 +87,7 @@ namespace LoadGenerator
 
             if (tasksToDispose.Count > 0)
             {
-                foreach(var item in tasksToDispose)
+                foreach (var item in tasksToDispose)
                 {
                     item.ThreadData.Source.Cancel();
                 }
@@ -101,7 +102,7 @@ namespace LoadGenerator
             ProcessCompletedTasks(timedOutTasks);
         }
 
-    private void RemoveCompletedTasks(List<TaskTracker> tasks, DynamicDataLoadSettings<TestData> settings, bool force = false)
+        private void RemoveCompletedTasks(List<TaskTracker> tasks, DynamicDataLoadSettings<TestData> settings, bool force = false)
         {
             if (force || tasks.Count >= settings.MaxSimulatedUsers)
             {
@@ -150,7 +151,7 @@ namespace LoadGenerator
         {
             DebugLog(s);
         }
-        private static int counter = 0;
+        private static int counter;
         protected void CreateNewTaskIfOrElseWait(List<TaskTracker> tasks, DynamicDataLoadSettings<TestData> settings, ILoadResults<TestData> results)
         {
             if (tasks.Count < settings.MaxSimulatedUsers)
@@ -167,7 +168,7 @@ namespace LoadGenerator
                 Action action = () =>
                                    {
 
-                                       while (threadData.Task==null) { Thread.Sleep(1); }
+                                       while (threadData.Task == null) { Thread.Sleep(1); }
                                        //Until now, it's not really "Started"
                                        task.StartTime = DateTime.Now;
                                        Write($"Starting task @ {task.StartTime} {localId}");
@@ -208,7 +209,7 @@ namespace LoadGenerator
                         {
                             settings = (DynamicDataLoadSettings<TestData>)e.Execute(results, settings);
                             UpdatePool(settings);
-                        } 
+                        }
                         else
                         {
                             if (!eventTasks.Any(a => a.Event == e))
@@ -223,7 +224,8 @@ namespace LoadGenerator
                                     Event = e,
 
                                 });
-                            } else
+                            }
+                            else
                             {
                                 Write("Skipping event");
                             }
@@ -258,7 +260,7 @@ namespace LoadGenerator
                 CreateNewTaskIfOrElseWait(tasks, settings, results);
             }
 
-            while(tasks.Count>0)
+            while (tasks.Count > 0)
             {
                 RemoveCompletedTasks(tasks, settings, true);
                 RunEvents(settings, results);
@@ -268,13 +270,13 @@ namespace LoadGenerator
             RunEvents(settings, results, true);
             Thread.Sleep(100);
             ProcessCompletedTasks(timedOutTasks);
-            foreach(var item in timedOutTasks)
+            foreach (var item in timedOutTasks)
             {
                 var startResult = CreateResult(item.Data);
                 startResult.ExecutionTime = TimeSpan.FromSeconds(settings.MaxTestExecutionTimeInSeconds);
-                startResult.Error = new Exception("Test timed out, results maybe asynchronusly added after this point");
+                startResult.ErrorResult = new Exception("Test timed out, results maybe asynchronusly added after this point");
                 startResult.Success = false;
-              
+
                 results.AddResult(startResult);
             }
 
@@ -300,7 +302,7 @@ namespace LoadGenerator
 
         protected override ILoadResults<TestData> InternalExecute(ILoadSettings<TestData> settings)
         {
-            return Execute( (DynamicDataLoadSettings<TestData>)settings);
+            return Execute((DynamicDataLoadSettings<TestData>)settings);
         }
     }
 }

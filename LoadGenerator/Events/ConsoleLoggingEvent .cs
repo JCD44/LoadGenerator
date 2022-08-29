@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LoadGenerator.Events
+﻿namespace LoadGenerator.Events
 {
     public class ConsoleLoggingEvent<TestData> : AbstractLoggingEvent<TestData>
     {

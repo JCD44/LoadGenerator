@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace LoadGenerator.Results
 {
     public interface ILoadResults<TestData>
     {
+        ResultStatusEnum Status { get; set; }
         ILoadSettings<TestData> Settings { get; set; }
         IEnumerable<ILoadResult<TestData>> Results { get; }
         public IEnumerable<ILoadResult<TestData>> Failures { get; }
@@ -16,6 +16,7 @@ namespace LoadGenerator.Results
         public int TotalFailures { get; }
         public int TotalSuccesses { get; }
         public int TotalResults { get; }
+        public ISummaryData<TestData> CreateSummary();
 
     }
 }

@@ -1,6 +1,4 @@
 ﻿using LoadGenerator.Results;
-using System;
-using System.Threading;
 
 namespace LoadGenerator.Events
 {
@@ -20,5 +18,5 @@ namespace LoadGenerator.Events
         void Init(ILoadSettings<TestData> settings);
 
     }
- 
+
 }

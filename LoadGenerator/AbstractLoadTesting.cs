@@ -57,12 +57,13 @@ namespace LoadGenerator
         /// <summary>
         /// Allows you to replace results with your own object.
         /// </summary>
-         protected virtual ILoadResults<TestData> CreateResults(ILoadSettings<TestData> settings)
+        protected virtual ILoadResults<TestData> CreateResults(ILoadSettings<TestData> settings)
         {
             return new LoadResults<TestData>()
             {
                 Settings = settings,
                 StartTime = DateTime.Now,
+                Status = ResultStatusEnum.Started,
             };
         }
 
@@ -70,6 +71,7 @@ namespace LoadGenerator
         {
             var end = DateTime.Now;
 
+            results.Status = ResultStatusEnum.Completed;
             results.ExecutionTime = end - results.StartTime;
 
             return results;
@@ -92,13 +94,13 @@ namespace LoadGenerator
 
             try
             {
-                    settings.TestMethod.Invoke(settings, threadData, data);
-                    result.Success = true;
+                settings.TestMethod.Invoke(settings, threadData, data);
+                result.Success = true;
             }
             catch (Exception ex)
             {
                 result.Success = false;
-                result.Error = ex;
+                result.ErrorResult = ex;
             }
 
             var end = DateTime.Now;

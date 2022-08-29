@@ -8,24 +8,32 @@
     <Company>Eternal Blue Software</Company>
     <PackageProjectUrl>https://github.com/JCD44/LoadGenerator</PackageProjectUrl>
     <RepositoryUrl>https://github.com/JCD44/LoadGenerator</RepositoryUrl>
-    <AssemblyVersion>0.9.0.0</AssemblyVersion>
-    <FileVersion>0.9.0.0</FileVersion>
-    <Version>0.9.0</Version>
+    <AssemblyVersion>0.9.0.1</AssemblyVersion>
+    <FileVersion>0.9.1.0</FileVersion>
+    <Version>0.9.1</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReleaseNotes>All release notes are maintained on github page.</PackageReleaseNotes>
     <Description>A package designed to allow you to run load tests on any arbitrary method that conforms to a specific signature.
 
 This is for engineers who make integration tests using API calls. Unfortunately, those integration tests never include any load testing. Instead, we make big complex load tests using record and playback of our website, making it difficult to debug which elements of the site are slow. Furthermore, because the load test is complex and often not built in the same tool we do everything else in, we don't run it frequently, so we don't get fast feedback on changes to performance. This tool is meant to allow you to do smaller load tests more frequently, mostly at the API level. It is not meant to replace the load testing tools which are more robust and complex, but rather to supplement them in the same way unit tests are not meant to replace system level testing. The big advantage to this system is that it is easy to wrap an API call in the framework and then perform a load test for each and every API endpoint you have. If you're not sure what the expected performance should be for a given endpoint in your non-production environment, you can even record the performance data into a database and then use that as a baseline.</Description>
-    <PackageTags>LoadTest, Test, Testing, Integration Testing, Performance Testing, load</PackageTags>
+    <PackageTags>LoadTest, Test, Testing, IntegrationTesting, Integration, Performance, PerformanceTesting, load</PackageTags>
     <Product>Load Generator</Product>
     <PackageId>LoadGenerator</PackageId>
     <Copyright>Copyright 2022</Copyright>
+    <Title>Load Generator</Title>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
 

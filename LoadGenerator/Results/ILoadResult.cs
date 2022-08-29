@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LoadGenerator.Results
 {
@@ -9,7 +7,7 @@ namespace LoadGenerator.Results
         bool Success { get; set; }
         DateTime StartTime { get; set; }
         TimeSpan ExecutionTime { get; set; }
-        Exception Error { get; set; }
+        Exception ErrorResult { get; set; }
         TestData Input { get; set; }
         DateTime EndTime { get; }
     }

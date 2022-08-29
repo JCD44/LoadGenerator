@@ -1,7 +1,5 @@
 ﻿using LoadGenerator.Results;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LoadGenerator.Events
 {
@@ -14,7 +12,7 @@ namespace LoadGenerator.Events
 
         public bool ShouldExecute(ILoadResults<TestData> results, ILoadSettings<TestData> settings)
         {
-           var shouldExecute = (int)(results.EndTime - TimeLastExecutionRequested).TotalSeconds> TimeBetweenCalls.TotalSeconds;
+            var shouldExecute = (int)(results.EndTime - TimeLastExecutionRequested).TotalSeconds > TimeBetweenCalls.TotalSeconds;
             if (shouldExecute) TimeLastExecutionRequested = DateTime.Now;
 
             return shouldExecute;

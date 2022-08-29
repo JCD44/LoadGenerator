@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 
 namespace LoadGenerator
 {
     public class ThreadSupportData
     {
-        private bool isDisposed = false;
+        private bool isDisposed;
         public ThreadSupportData(CancellationTokenSource source)
         {
             Source = source;

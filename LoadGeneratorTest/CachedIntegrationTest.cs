@@ -4,7 +4,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 namespace LoadGeneratorTest
 {
@@ -12,7 +11,7 @@ namespace LoadGeneratorTest
 
     public class CachedIntegrationTest
     {
-        private static Random random = new Random();
+        private static readonly Random random = new Random();
         private static int MaxMethodExecutions = 0;
 
         public void UpdateThreadName()
@@ -25,7 +24,7 @@ namespace LoadGeneratorTest
         private static int counter = 0;
         private static IEnumerable<TestData> CreateData(ILoadSettings<TestData> settings)
         {
-            for(int i=0; i<= MaxMethodExecutions; i++)
+            for (int i = 0; i <= MaxMethodExecutions; i++)
                 yield return new TestData() { Data = random.Next(1, 1000) + " - abc" + counter++ };
         }
 
@@ -66,7 +65,7 @@ namespace LoadGeneratorTest
 
         public static void Write(string s)
         {
-            Console.WriteLine($"ID: {System.Threading.Thread.CurrentThread.ManagedThreadId}, {DateTime.Now.ToString("hh:mm:ss.fff")} - {s}");
+            Console.WriteLine($"ID: {System.Threading.Thread.CurrentThread.ManagedThreadId}, {DateTime.Now:hh:mm:ss.fff} - {s}");
         }
 
         private void LogResults(ILoadResults<TestData> results)
@@ -75,7 +74,7 @@ namespace LoadGeneratorTest
             Write($"Total Time: {results.ExecutionTime}");
             foreach (var r in results.Results)
             {
-                Write($"{r.Input} - {r.Success} - {r.StartTime} - {r.ExecutionTime} - {r?.Error?.Message}");
+                Write($"{r.Input} - {r.Success} - {r.StartTime} - {r.ExecutionTime} - {r?.ErrorResult?.Message}");
             }
         }
 
@@ -84,7 +83,7 @@ namespace LoadGeneratorTest
             Assert.IsTrue(MaxMethodExecutions <= results.Results.Count(), "Requested number of executions equalts results");
             foreach (var r in results.Results)
             {
-                var hasError = r.Error != null;
+                var hasError = r.ErrorResult != null;
                 Assert.AreEqual(hasError, !r.Success, "Success marked true when it doesn't have an exception");
             }
         }
@@ -137,7 +136,7 @@ namespace LoadGeneratorTest
             Write("Asserts:");
             foreach (var r in results.Results)
             {
-                Assert.IsNotNull(r.Error, "Error");
+                Assert.IsNotNull(r.ErrorResult, "Error");
             }
             BasicAsserts(settings, results);
 
@@ -163,7 +162,7 @@ namespace LoadGeneratorTest
 
             foreach (var r in results.Results)
             {
-                var hasError = r.Error != null;
+                var hasError = r.ErrorResult != null;
                 Assert.AreEqual(hasError, !r.Success, "Success marked true when it doesn't have an exception");
             }
 
