@@ -11,7 +11,7 @@ namespace LoadGenerator.Results
         public Dictionary<String, int> ErrorCountGroupedByMessage { get; }
         public double TransactionsPerSecond { get; }
         public TimeSpan RunTime { get; }
-        public ResultStatusEnum Status { get; }
+        public ResultStatus Status { get; }
         string ToStringDetails();
         ISummaryData<TestData> CreateSummary(ILoadResults<TestData> results, ISummaryCleanup cleanup);
 

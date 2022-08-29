@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32002.261
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadGenerator", "LoadGenerator\LoadGenerator.csproj", "{637F429A-FB5B-4E75-B262-54C26C4B1B3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoadGenerator", "LoadGenerator\LoadGenerator.csproj", "{637F429A-FB5B-4E75-B262-54C26C4B1B3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadGeneratorTest", "LoadGeneratorTest\LoadGeneratorTest.csproj", "{8526B330-FEBA-48BE-AFE3-98E80D355008}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoadGeneratorTest", "LoadGeneratorTest\LoadGeneratorTest.csproj", "{8526B330-FEBA-48BE-AFE3-98E80D355008}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{643F9197-332E-44C5-A7A6-9A009EBB3556}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

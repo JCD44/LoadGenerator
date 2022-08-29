@@ -15,7 +15,7 @@ namespace LoadGenerator
         /// <summary>
         /// This is the max time of the entire test, not the max time of any given test.
         /// </summary>
-        public int MaxExecutionTimeInSeconds { get; set; } = 0;
+        public int MaxExecutionTimeInSeconds { get; set; }
 
 
     }

@@ -166,7 +166,7 @@ Currently only some basic integration tests exist.  One interesting problem is t
 
 ## Built With
 
-* Visual Studio 2019
+* Visual Studio 2022
 * .net standard 2.1
 
 ## Contributing
@@ -175,6 +175,7 @@ Feel free to contact me, however any pull request without clear documentation of
 
 ## Versioning
 
+0.9.1 - Added summary result data used for reporting.  Some breaking changes occurred in results where names were changed.  Did some cleanup based upon .net analysis after having upgraded to VS 2022.
 0.9.0 - Initial Release.
 
 

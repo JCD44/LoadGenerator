@@ -5,9 +5,9 @@ namespace LoadGenerator.Results
 {
     public interface ILoadResults<TestData>
     {
-        ResultStatusEnum Status { get; set; }
+        ResultStatus Status { get; set; }
         ILoadSettings<TestData> Settings { get; set; }
-        IEnumerable<ILoadResult<TestData>> Results { get; }
+        IEnumerable<ILoadResult<TestData>> ResultDetails { get; }
         public IEnumerable<ILoadResult<TestData>> Failures { get; }
         public void AddResult(ILoadResult<TestData> result);
         public DateTime StartTime { get; set; }

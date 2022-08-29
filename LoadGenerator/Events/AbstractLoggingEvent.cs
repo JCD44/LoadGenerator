@@ -11,9 +11,9 @@ namespace LoadGenerator.Events
             if (IncludeDetails) return results.CreateSummary().ToStringDetails();
             return results.CreateSummary().ToString();
         }
-        public override ILoadSettings<TestData> Execute(ILoadResults<TestData> result, ILoadSettings<TestData> settings)
+        public override ILoadSettings<TestData> Execute(ILoadResults<TestData> results, ILoadSettings<TestData> settings)
         {
-            Log(ResultToString(result));
+            Log(ResultToString(results));
 
             return settings;
         }

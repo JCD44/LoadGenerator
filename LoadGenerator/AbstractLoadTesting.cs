@@ -6,7 +6,8 @@ namespace LoadGenerator
 {
     public abstract class AbstractLoadTesting<TestData> : ILoadTesting<TestData>
     {
-        private static readonly bool WriteLog = false;
+        //This is not set because it is meant for debugging during development.  I'm purposefully not including a logger to keep dependencies to 0.
+        private static readonly bool WriteLog;
         /// <summary>
         /// How many additional threads does the threadpool need to allocate in order to support 
         /// whatever nuget packages you have that may also be using tasks.  By default we give 
@@ -63,7 +64,7 @@ namespace LoadGenerator
             {
                 Settings = settings,
                 StartTime = DateTime.Now,
-                Status = ResultStatusEnum.Started,
+                Status = ResultStatus.Started,
             };
         }
 
@@ -71,7 +72,7 @@ namespace LoadGenerator
         {
             var end = DateTime.Now;
 
-            results.Status = ResultStatusEnum.Completed;
+            results.Status = ResultStatus.Completed;
             results.ExecutionTime = end - results.StartTime;
 
             return results;
@@ -81,7 +82,7 @@ namespace LoadGenerator
         /// </summary>
         protected virtual ILoadResult<TestData> CreateResult(TestData data)
         {
-            return new LoadResult<TestData>
+            return new LoadResultDetails<TestData>
             {
                 StartTime = DateTime.Now,
                 Input = data
@@ -100,7 +101,7 @@ namespace LoadGenerator
             catch (Exception ex)
             {
                 result.Success = false;
-                result.ErrorResult = ex;
+                result.Exception = ex;
             }
 
             var end = DateTime.Now;
@@ -141,7 +142,7 @@ namespace LoadGenerator
         protected static void DebugLog(string s)
         {
             if (!WriteLog) return;
-            Console.WriteLine($"ID: {System.Threading.Thread.CurrentThread.ManagedThreadId}, {DateTime.Now.ToString("hh:mm:ss.fff")} - {s}");
+            Console.WriteLine($"ID: {Environment.CurrentManagedThreadId}, {DateTime.Now:hh:mm:ss.fff} - {s}");
         }
 
 

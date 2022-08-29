@@ -134,7 +134,7 @@ namespace LoadGenerator
 
         protected bool HasExecutedMaxResults(ILoadResults<TestData> results, List<TaskTracker> tasks, DynamicDataLoadSettings<TestData> settings)
         {
-            var result = results.Results.Count() + timedOutTasks.Count + tasks.Count >= settings.MaxMethodExecutions;
+            var result = results.ResultDetails.Count() + timedOutTasks.Count + tasks.Count >= settings.MaxMethodExecutions;
             lock (tasks)
             {
                 if (result)
@@ -142,7 +142,7 @@ namespace LoadGenerator
                     RemoveCompletedTasks(tasks, settings, true);
                 }
 
-                return results.Results.Count() + timedOutTasks.Count + tasks.Count >= settings.MaxMethodExecutions;
+                return results.ResultDetails.Count() + timedOutTasks.Count + tasks.Count >= settings.MaxMethodExecutions;
             }
 
         }
@@ -274,7 +274,7 @@ namespace LoadGenerator
             {
                 var startResult = CreateResult(item.Data);
                 startResult.ExecutionTime = TimeSpan.FromSeconds(settings.MaxTestExecutionTimeInSeconds);
-                startResult.ErrorResult = new Exception("Test timed out, results maybe asynchronusly added after this point");
+                startResult.Exception = new Exception("Test timed out, results maybe asynchronusly added after this point");
                 startResult.Success = false;
 
                 results.AddResult(startResult);

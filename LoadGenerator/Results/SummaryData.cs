@@ -7,17 +7,17 @@ namespace LoadGenerator.Results
 {
     public class SummaryData<TestData> : ISummaryData<TestData>
     {
-        public int Passes { get; set; } = 0;
-        public int Fails { get; set; } = 0;
-        public int TotalResults { get; set; } = 0;
+        public int Passes { get; set; }
+        public int Fails { get; set; }
+        public int TotalResults { get; set; }
         public Dictionary<string, int> ErrorCountGroupedByMessage { get; set; } = new Dictionary<string, int>();
-        public double TransactionsPerSecond { get; set; } = 0;
+        public double TransactionsPerSecond { get; set; }
         public TimeSpan RunTime { get; set; } = TimeSpan.MinValue;
-        public ResultStatusEnum Status { get; set; } = ResultStatusEnum.NotStarted;
+        public ResultStatus Status { get; set; } = ResultStatus.NotStarted;
 
         public ISummaryData<TestData> CreateSummary(ILoadResults<TestData> results, ISummaryCleanup cleanup)
         {
-            var ResultDetails = results.Results;
+            var ResultDetails = results.ResultDetails;
             var list = new List<ILoadResult<TestData>>();
             lock (ResultDetails) { list.AddRange(ResultDetails); }
 
@@ -30,9 +30,9 @@ namespace LoadGenerator.Results
             TransactionsPerSecond = Math.Round((TotalResults - Fails) / RunTime.TotalSeconds, 2);
             Status = results.Status;
 
-            foreach (var result in list.Where(a => a.ErrorResult != null))
+            foreach (var result in list.Where(a => a.Exception != null))
             {
-                var message = cleanup.CleanupErrorMessage(result.ErrorResult);
+                var message = cleanup.CleanupErrorMessage(result.Exception);
                 if (ErrorCountGroupedByMessage.ContainsKey(message))
                 {
                     ErrorCountGroupedByMessage[message]++;

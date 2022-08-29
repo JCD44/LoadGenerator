@@ -7,7 +7,7 @@ namespace LoadGenerator.Results
         bool Success { get; set; }
         DateTime StartTime { get; set; }
         TimeSpan ExecutionTime { get; set; }
-        Exception ErrorResult { get; set; }
+        Exception Exception { get; set; }
         TestData Input { get; set; }
         DateTime EndTime { get; }
     }

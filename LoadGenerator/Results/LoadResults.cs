@@ -7,27 +7,27 @@ namespace LoadGenerator.Results
 {
     public class LoadResults<TestData> : ILoadResults<TestData>
     {
-        public ResultStatusEnum Status { get; set; } = ResultStatusEnum.NotStarted;
+        public ResultStatus Status { get; set; } = ResultStatus.NotStarted;
         public ILoadSettings<TestData> Settings { get; set; }
-        public IEnumerable<ILoadResult<TestData>> Results { get; private set; } = new Queue<ILoadResult<TestData>>();
-        public IEnumerable<ILoadResult<TestData>> Failures { get { return Results.Where(a => !a.Success); } }
-        public int TotalFailures { get { return Results.Count(a => !a.Success); } }
-        public int TotalSuccesses { get { return Results.Count(a => a.Success); } }
-        public int TotalResults { get { return Results.Count(); } }
+        public IEnumerable<ILoadResult<TestData>> ResultDetails { get; private set; } = new Queue<ILoadResult<TestData>>();
+        public IEnumerable<ILoadResult<TestData>> Failures { get { return ResultDetails.Where(a => !a.Success); } }
+        public int TotalFailures { get { return ResultDetails.Count(a => !a.Success); } }
+        public int TotalSuccesses { get { return ResultDetails.Count(a => a.Success); } }
+        public int TotalResults { get { return ResultDetails.Count(); } }
         public void AddResult(ILoadResult<TestData> result)
         {
             //This is a weird way to do it but I didn't find a easier way to determine something is a "Queue"... This maybe something to look into.
-            var isQueue = Results.GetType().GetMembers().Any(a => a.Name == "Enqueue");
+            var isQueue = ResultDetails.GetType().GetMembers().Any(a => a.Name == "Enqueue");
 
-            lock (Results)
+            lock (ResultDetails)
             {
                 if (isQueue)
                 {
-                    ((Queue<ILoadResult<TestData>>)Results).Enqueue(result);
+                    ((Queue<ILoadResult<TestData>>)ResultDetails).Enqueue(result);
                 }
                 else
                 {
-                    ((IList)Results).Add(result);
+                    ((IList)ResultDetails).Add(result);
                 }
             }
         }

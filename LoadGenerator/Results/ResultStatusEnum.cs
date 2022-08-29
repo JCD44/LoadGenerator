@@ -1,6 +1,6 @@
 ﻿namespace LoadGenerator.Results
 {
-    public enum ResultStatusEnum
+    public enum ResultStatus
     {
         Started,
         Completed,

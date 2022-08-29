@@ -72,18 +72,18 @@ namespace LoadGeneratorTest
         {
             Write("Logging for Debug:");
             Write($"Total Time: {results.ExecutionTime}");
-            foreach (var r in results.Results)
+            foreach (var r in results.ResultDetails)
             {
-                Write($"{r.Input} - {r.Success} - {r.StartTime} - {r.ExecutionTime} - {r?.ErrorResult?.Message}");
+                Write($"{r.Input} - {r.Success} - {r.StartTime} - {r.ExecutionTime} - {r?.Exception?.Message}");
             }
         }
 
         private void BasicAsserts(CachedDataLoadSettings<TestData> settings, ILoadResults<TestData> results)
         {
-            Assert.IsTrue(MaxMethodExecutions <= results.Results.Count(), "Requested number of executions equalts results");
-            foreach (var r in results.Results)
+            Assert.IsTrue(MaxMethodExecutions <= results.ResultDetails.Count(), "Requested number of executions equalts results");
+            foreach (var r in results.ResultDetails)
             {
-                var hasError = r.ErrorResult != null;
+                var hasError = r.Exception != null;
                 Assert.AreEqual(hasError, !r.Success, "Success marked true when it doesn't have an exception");
             }
         }
@@ -134,9 +134,9 @@ namespace LoadGeneratorTest
             LogResults(results);
 
             Write("Asserts:");
-            foreach (var r in results.Results)
+            foreach (var r in results.ResultDetails)
             {
-                Assert.IsNotNull(r.ErrorResult, "Error");
+                Assert.IsNotNull(r.Exception, "Error");
             }
             BasicAsserts(settings, results);
 
@@ -160,14 +160,14 @@ namespace LoadGeneratorTest
 
             Write("Asserts:");
 
-            foreach (var r in results.Results)
+            foreach (var r in results.ResultDetails)
             {
-                var hasError = r.ErrorResult != null;
+                var hasError = r.Exception != null;
                 Assert.AreEqual(hasError, !r.Success, "Success marked true when it doesn't have an exception");
             }
 
             Assert.IsTrue(results.ExecutionTime.TotalSeconds < 15, "Timespan should be much less than 15 seconds as each test takes 5 seconds");
-            Assert.IsTrue(results.Results.Count() <= 2, "No more than 2 results should be recorded.");
+            Assert.IsTrue(results.ResultDetails.Count() <= 2, "No more than 2 results should be recorded.");
 
 
         }
